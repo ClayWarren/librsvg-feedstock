@@ -8,3 +8,7 @@ if (Test-Path C:\rsvg-build) {
 for ($i = 0; $i -lt $logs.Count; $i++) {
     Copy-Item $logs[$i].FullName "native-results\testlog-$i.txt"
 }
+$referenceOutput = Join-Path $env:TEMP 'rsvg-test-output'
+if (Test-Path $referenceOutput) {
+    Get-ChildItem $referenceOutput -Filter '*.png' | Copy-Item -Destination native-results
+}
