@@ -13,6 +13,7 @@ source:
   patches:
     - add_rust_lto.patch
     - windows_gir.patch  # [win]
+    - windows-test-fonts.patch  # [win]
 
 build:
   number: 1
@@ -39,6 +40,7 @@ requirements:
     - gi-docgen
     - gobject-introspection
     # Meson 1.12 duplicates raw linker flags in the MSVC compiler sanity check.
+    # https://github.com/mesonbuild/meson/issues/16111
     - meson <1.12  # [win]
     - meson  # [not win]
     - ninja
