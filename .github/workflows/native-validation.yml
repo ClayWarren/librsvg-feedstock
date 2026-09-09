@@ -1,0 +1,97 @@
+name: Native Windows librsvg validation (fork only)
+on:
+  push:
+    branches: [codex/windows-arm64-validation]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  parents:
+    if: github.repository == 'ClayWarren/librsvg-feedstock'
+    runs-on: windows-11-arm
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [graphics, buildtools]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Prepare native runner and retained prerequisites
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./ci/prepare.ps1 win-arm64
+      - name: Build prerequisite recipes with their package tests
+        shell: cmd
+        run: ci\run.cmd ${{ matrix.group }} win-arm64
+      - name: Stage artifacts
+        if: always()
+        shell: pwsh
+        run: ./ci/stage.ps1 win-arm64
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: parents-${{ matrix.group }}
+          path: native-results/*
+          retention-days: 14
+  arm64:
+    needs: parents
+    runs-on: windows-11-arm
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Prepare native runner
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./ci/prepare.ps1 win-arm64
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: parents-*
+          path: parent-results
+      - name: Verify prerequisite hashes and stage packages
+        shell: pwsh
+        run: |
+          foreach ($manifest in (Get-ChildItem parent-results -Recurse -Filter sha256.json)) {
+            foreach ($item in (Get-Content $manifest.FullName -Raw | ConvertFrom-Json)) {
+              $path = Join-Path $manifest.DirectoryName $item.file
+              if ((Get-FileHash $path -Algorithm SHA256).Hash.ToLower() -ne $item.sha256) { throw "Wrong hash: $path" }
+              Copy-Item $path C:\rsvg-local\win-arm64 -Force
+            }
+          }
+      - name: Build librsvg and execute upstream and installed tests
+        shell: cmd
+        run: ci\run.cmd librsvg win-arm64
+      - name: Stage artifacts
+        if: always()
+        shell: pwsh
+        run: ./ci/stage.ps1 win-arm64
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: librsvg-win-arm64
+          path: native-results/*
+          retention-days: 14
+  x64:
+    if: github.repository == 'ClayWarren/librsvg-feedstock'
+    runs-on: windows-2022
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Prepare native runner
+        shell: pwsh
+        run: ./ci/prepare.ps1 win-64
+      - name: Build librsvg and execute upstream and installed tests
+        shell: cmd
+        run: ci\run.cmd librsvg win-64
+      - name: Stage artifacts
+        if: always()
+        shell: pwsh
+        run: ./ci/stage.ps1 win-64
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        if: always()
+        with:
+          name: librsvg-win-64
+          path: native-results/*
+          retention-days: 14

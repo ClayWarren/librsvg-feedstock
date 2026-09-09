@@ -1,0 +1,103 @@
+schema_version: 1
+
+context:
+  name: libgit2
+  version: "1.9.7"
+
+package:
+  name: ${{ name|lower }}
+  version: ${{ version }}
+
+source:
+  url: https://github.com/${{ name }}/${{ name }}/archive/v${{ version }}.tar.gz
+  sha256: 1a4fbe7589e814777ae76b64734ad80f4ecad22cd33a22682a2aaea4ae5375e7
+  patches:
+    # TODO: Propose this patch to upstream.
+    # Downside: This breaks pkg-config for static builds (not relevant for conda-forge).
+    - 0001-Use-Requires.internal-instead-of-Requires.private.patch
+
+build:
+  number: 0
+
+requirements:
+  build:
+    - cmake
+    - ninja
+    - if: not win
+      then: pkg-config
+    - ${{ compiler('c') }}
+    - ${{ stdlib("c") }}
+    - ${{ compiler('cxx') }}
+  host:
+    - if: target_platform == "win-64"
+      then: msinttypes
+    - if: not win
+      then: openssl
+    - if: osx
+      then: libiconv
+    - if: unix
+      then: pcre2
+    - curl
+    - libssh2
+    - zlib
+  run_exports:
+    - ${{ pin_subpackage("libgit2", upper_bound="x.x") }}
+
+tests:
+  - requirements:
+      run:
+        - if: target_platform != "win-arm64"
+          then: pkg-config
+    script:
+      - if: not win
+        then: test -f $PREFIX/include/git2.h
+        else: if not exist %LIBRARY_INC%\\git2.h exit 1
+      - if: unix
+        then: test -f $PREFIX/lib/libgit2${SHLIB_EXT}
+      - if: win
+        then:
+          - if not exist %LIBRARY_LIB%\\git2.lib exit 1
+          - if not exist %LIBRARY_BIN%\\git2.dll exit 1
+      - if: target_platform != "win-arm64"
+        then: pkg-config --cflags --libs libgit2
+  - files:
+      recipe:
+        - test_win_arm64.c
+    requirements:
+      run:
+        - if: target_platform == "win-arm64"
+          then: ${{ compiler('c') }}
+    script:
+      - if: target_platform == "win-arm64"
+        then:
+          - call %CC% /nologo /I"%LIBRARY_INC%" test_win_arm64.c /link /LIBPATH:"%LIBRARY_LIB%" git2.lib /OUT:libgit2_consumer.exe
+          - if errorlevel 1 exit 1
+          - libgit2_consumer.exe
+          - if errorlevel 1 exit 1
+          - dumpbin /headers "%LIBRARY_BIN%\git2.dll" | findstr /I /C:"AA64 machine (ARM64)"
+          - if errorlevel 1 exit 1
+          - dumpbin /headers libgit2_consumer.exe | findstr /I /C:"AA64 machine (ARM64)"
+          - if errorlevel 1 exit 1
+      - if: target_platform != "win-arm64"
+        then: echo "Native Windows ARM64 consumer test only"
+
+about:
+  license: GPL-2.0-only WITH GCC-exception-2.0
+  license_file: COPYING
+  summary: libgit2 is a portable, pure C implementation of the Git core methods provided as a re-entrant linkable library with a solid API, allowing you to write native speed custom Git applications in any language which supports C bindings.
+  # The remaining entries in this section are optional, but recommended
+  description: |
+    libgit2 is a portable, pure C implementation of the Git core methods
+    provided as a re-entrant linkable library with a solid API, allowing
+    you to write native speed custom Git applications in any language
+    which supports C bindings.
+
+
+  homepage: https://libgit2.github.com
+
+extra:
+  # Required by the current feedstock-name lint because the package name is templated.
+  feedstock-name: libgit2
+  recipe-maintainers:
+    - shadowwalkersb
+    - xhochy
