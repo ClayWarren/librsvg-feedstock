@@ -3,30 +3,65 @@
     "name": "pygobject",
     "repository": "conda-forge/pygobject-feedstock",
     "commit": "e5894c679a818f82c7551512c0e17e932417a065",
-    "variant_source": ".ci_support/win_64_python3.14.____cp314.yaml"
+    "variant_source": ".ci_support/win_64_python3.14.____cp314.yaml",
+    "validation_changes": [
+      "Restrict the explicit ucrt dependency to Windows targets other than ARM64, whose OS supplies UCRT."
+    ],
+    "variant_overrides": {
+      "target_platform": "win-arm64",
+      "build_platform": "win-arm64",
+      "c_compiler": "vs2022",
+      "cxx_compiler": "vs2022",
+      "python": "3.14.* *_cp314"
+    }
   },
   {
     "name": "harfbuzz",
     "repository": "conda-forge/harfbuzz-feedstock",
     "commit": "83850026fa464fcc80848bc17c44a2c9a0475146",
-    "variant_source": ".ci_support/win_64_.yaml"
+    "variant_source": ".ci_support/win_64_.yaml",
+    "variant_overrides": {
+      "target_platform": "win-arm64",
+      "build_platform": "win-arm64",
+      "c_compiler": "vs2022",
+      "cxx_compiler": "vs2022",
+      "python": "3.14.* *_cp314"
+    }
   },
   {
     "name": "pango",
     "repository": "conda-forge/pango-feedstock",
     "commit": "55181a3b42d2e1e9ed44065cb0bd8e4fd63cd5bd",
-    "variant_source": ".ci_support/win_64_.yaml"
+    "variant_source": ".ci_support/win_64_.yaml",
+    "variant_overrides": {
+      "target_platform": "win-arm64",
+      "build_platform": "win-arm64",
+      "c_compiler": "vs2022",
+      "cxx_compiler": "vs2022",
+      "python": "3.14.* *_cp314"
+    }
   },
   {
     "name": "libgit2",
     "repository": "conda-forge/libgit2-feedstock",
     "commit": "9b4ba6fe352cdd69b5a2e3b3b6aa03ba223114be",
-    "variant_source": ".ci_support/win_arm64_.yaml"
+    "variant_source": ".ci_support/win_arm64_.yaml",
+    "variant_overrides": {
+      "build_platform": "win-arm64",
+      "target_platform": "win-arm64"
+    }
   },
   {
     "name": "cargo-c",
     "repository": "conda-forge/cargo-c-feedstock",
     "commit": "4132d2b5a1cf5edef8899805536e504e84f8baac",
-    "variant_source": ".ci_support/win_64_.yaml"
+    "variant_source": ".ci_support/win_64_.yaml",
+    "variant_overrides": {
+      "target_platform": "win-arm64",
+      "build_platform": "win-arm64",
+      "c_compiler": "vs2022",
+      "cxx_compiler": "vs2022",
+      "python": "3.14.* *_cp314"
+    }
   }
 ]
