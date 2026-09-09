@@ -47,6 +47,9 @@ if errorlevel 1 exit 1
 ninja
 if errorlevel 1 exit 1
 
+meson test --print-errorlogs
+if errorlevel 1 exit 1
+
 ninja install
 if errorlevel 1 exit 1
 

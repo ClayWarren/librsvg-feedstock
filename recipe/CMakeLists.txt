@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.16)
+project(rsvg_consumer C)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(RSVG REQUIRED IMPORTED_TARGET librsvg-2.0 gdk-pixbuf-2.0 cairo)
+add_executable(rsvg-consumer test-consumer.c)
+target_link_libraries(rsvg-consumer PRIVATE PkgConfig::RSVG)

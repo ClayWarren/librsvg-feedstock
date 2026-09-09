@@ -15,7 +15,7 @@ source:
     - windows_gir.patch  # [win]
 
 build:
-  number: 0
+  number: 1
   run_exports:
     # Looks good but no new info after 2.43 so keeping it x.x for safety.
     # https://abi-laboratory.pro/?view=timeline&l=librsvg
@@ -33,6 +33,7 @@ build:
 
 requirements:
   build:
+    - python >=3.14  # [win and arm64]
     - cargo-c
     - docutils
     - gi-docgen
@@ -72,8 +73,18 @@ requirements:
     - zlib
 
 test:
+  files:
+    - CMakeLists.txt  # [win]
+    - test-consumer.c  # [win]
+    - test.svg  # [win]
   requires:
     - pkg-config
+    - {{ compiler("c") }}  # [win]
+    - cmake  # [win]
+    - ninja  # [win]
+    - glib  # [win]
+    - cairo  # [win]
+    - zlib  # [win]
   commands:
     - rsvg-convert --version
 
