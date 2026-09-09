@@ -28,8 +28,6 @@ libxml2:
 - '2.15'
 libxml2_devel:
 - '2.15'
-pango:
-- '1'
 rust_compiler:
 - rust
 target_platform:
