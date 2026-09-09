@@ -42,7 +42,7 @@ requirements:
     - libiconv  # on Windows we seem to need the conda-forge version here (see #15)
     - pycairo
     - python
-    - ucrt  # [win]
+    - ucrt  # [win and not arm64]
 
 test:
   requires:
