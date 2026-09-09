@@ -1,0 +1,46 @@
+Subject: [PATCH] tests: load reference fonts with Windows Fontconfig builds
+
+Conda-forge provides Fontconfig and PangoFT2 on Windows. Enable the
+existing test-only font map setup there so reference and text tests use
+their bundled fonts instead of unrelated system fonts.
+
+--- a/rsvg/src/test_utils/mod.rs
++++ b/rsvg/src/test_utils/mod.rs
+@@ -44,7 +44,7 @@
+ }
+ 
+ #[cfg(all(
+-    all(not(target_os = "macos"), not(target_os = "windows")),
++    not(target_os = "macos"),
+     system_deps_have_fontconfig,
+     system_deps_have_pangoft2
+ ))]
+@@ -118,7 +118,7 @@
+ }
+ 
+ #[cfg(all(
+-    all(not(target_os = "macos"), not(target_os = "windows")),
++    not(target_os = "macos"),
+     system_deps_have_fontconfig,
+     system_deps_have_pangoft2
+ ))]
+@@ -129,7 +129,7 @@
+ }
+ 
+ #[cfg(any(
+-    any(target_os = "macos", target_os = "windows"),
++    target_os = "macos",
+     not(system_deps_have_fontconfig),
+     not(system_deps_have_pangoft2)
+ ))]
+--- a/rsvg/Cargo.toml
++++ b/rsvg/Cargo.toml
+@@ -79,7 +79,7 @@
+ url.workspace = true
+ xml5ever.workspace = true
+ 
+-[target.'cfg(all(not(target_os = "macos"), not(target_os = "windows")))'.dependencies]
++[target.'cfg(not(target_os = "macos"))'.dependencies]
+ yeslogic-fontconfig-sys = { workspace = true, optional = true }
+ 
+ [dev-dependencies]
