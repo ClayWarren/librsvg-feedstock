@@ -86,6 +86,12 @@ test:
     - ninja  # [win]
     - glib  # [win]
     - cairo  # [win]
+    # Development metadata referenced by librsvg's pkg-config requirements.
+    - expat  # [win]
+    - freetype  # [win]
+    - harfbuzz  # [win]
+    - liblzma-devel  # [win]
+    - libxml2-devel  # [win]
     - zlib  # [win]
   commands:
     - rsvg-convert --version
