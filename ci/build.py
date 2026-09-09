@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import yaml
 
 group = sys.argv[1]
 subdir = sys.argv[2]
@@ -23,7 +24,11 @@ for name in groups[group]:
     index()
     base = Path(".") if name == "librsvg" else Path("ci/parents") / name
     if name == "libgit2":
-        run(["rattler-build", "build", "--recipe", str(base / "recipe"), "-m", str(base / "variants.yaml"),
+        variants = yaml.safe_load((base / "variants.yaml").read_text())
+        variants.pop("channel_sources", None)
+        config = local / "libgit2-variants.yaml"
+        config.write_text(yaml.safe_dump(variants))
+        run(["rattler-build", "build", "--recipe", str(base / "recipe"), "-m", str(config),
              "--build-platform", subdir, "--target-platform", subdir, "--test", "native-and-emulated",
              "--output-dir", str(local), "--channel-priority", "strict", "-c", "file:///C:/rsvg-local", "-c", "conda-forge"])
     else:
