@@ -8,12 +8,16 @@ package:
   version: {{ version }}
 
 source:
-  url: https://download.gnome.org/sources/{{ name }}/{{ version_majmin }}/{{ name }}-{{ version }}.tar.xz
-  sha256: 7eb449b2722a768021356f66dfee3202c229b54ed4e6a70ce40c090e97ff16f2
-  patches:
-    - add_rust_lto.patch
-    - windows_gir.patch  # [win]
-    - windows-test-fonts.patch  # [win]
+  - url: https://download.gnome.org/sources/{{ name }}/{{ version_majmin }}/{{ name }}-{{ version }}.tar.xz
+    sha256: 7eb449b2722a768021356f66dfee3202c229b54ed4e6a70ce40c090e97ff16f2
+    patches:
+      - add_rust_lto.patch
+      - windows_gir.patch  # [win]
+      - windows-test-fonts.patch  # [win]
+  # Upstream #1237: reference image for Pango >=1.58.1 underline rendering.
+  - url: https://raw.githubusercontent.com/GNOME/librsvg/55a08a24cbd93c042872d6b95f7bb59d3460a0f3/rsvg/tests/fixtures/reftests/svg1.1/text-text-03-b-ref.png  # [win]
+    sha256: 31ae412241a1bfcd53a2a1e27a4e8ef794656d0e9e233734b3754f0b5c980cfa  # [win]
+    folder: rsvg/tests/fixtures/reftests/svg1.1  # [win]
 
 build:
   number: 1
@@ -66,7 +70,8 @@ requirements:
     - libxml2-devel
     - cairo
     - gdk-pixbuf
-    - pango
+    - pango >=1.58.1  # [win]
+    - pango  # [not win]
     - harfbuzz
     - libpng    # [linux]
     - freetype
